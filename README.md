@@ -1,40 +1,45 @@
 # Trading Strategies & Vectorized Backtesting
 
-Strategie di trading algoritmico e backtesting vettorizzato, basati su *Python for Algorithmic Trading* di Yves Hilpisch.
+Algorithmic trading strategies and vectorized backtesting, based on *Python for Algorithmic Trading* by Yves Hilpisch.
 
-## Moduli (strategie)
+## Workflow
 
-| File | Strategia |
-|---|---|
-| `SMAVectorBacktester.py` | Incrocio di medie mobili semplici (SMA crossover), con ottimizzazione brute-force dei parametri |
-| `MomVectorBacktester.py` | Momentum / time-series momentum |
-| `MRVectorBacktester.py` | Mean reversion |
-| `sma_homework_lezione3.py` | Compito a casa: variante del backtester SMA |
+The repository follows a three-step progression:
 
-Ogni modulo è eseguibile direttamente (`python SMAVectorBacktester.py`) grazie al blocco `if __name__ == '__main__'`.
+1. **`step_by_step_backtesting.ipynb`** :  builds each strategy **from scratch**, step by step. Three strategies are covered:
+   - **SMA crossover** (Simple Moving Averages): long when the faster SMA is above the slower one, short otherwise.
+   - **Momentum** (time-series momentum): position given by the sign of the rolling mean of recent returns.
+   - **Mean reversion**: trades the distance between the price and its SMA, entering when it exceeds a threshold.
 
-## Notebook
+   For each strategy the notebook computes, briefly: data loading and log returns, position definition (vectorized with `np.where` / `np.sign`), strategy returns (lagged position × return), cumulative performance vs. the buy-and-hold benchmark, and drawdowns. It also includes an example on intraday data (`SPX_1min_05052020.csv`).
 
-- **`Vectorized_backtesting.ipynb`** — costruisce le tre strategie **passo passo** (definizione della posizione, calcolo dei rendimenti, drawdown, ecc.); include anche un esempio su dati intraday (`SPX_1min_05052020.csv`).
-  > Nota: la sezione teorica iniziale "Making Use of Vectorization" (NumPy e pandas) è stata spostata nella repo `python-basics`, notebook `theory_data_structures.ipynb` — qui resta solo la parte pratica su strategie e backtesting.
-- **`Generalized_backtesting.ipynb`** — raccoglie le sezioni "Generalizing the Approach" delle tre strategie: applica direttamente le classi dei moduli `.py` (SMA, Momentum, Mean-Reversion) per eseguire i backtest in poche righe, inclusa l'ottimizzazione dei parametri (built-in per SMA, brute force per Mean-Reversion).
-- **`ProvaEsameBande.ipynb`** — strategia mean-reversion con bande di Bollinger (prova d'esame).
+2. **The `.py` modules** :  automate the whole process by wrapping each strategy in a class (data retrieval, backtest, plotting), and also introduce **parameter optimization**:
 
-## Dati
+   | File | Strategy |
+   |---|---|
+   | `SMAVectorBacktester.py` | SMA crossover, with built-in brute-force optimization of the two SMA windows |
+   | `MomVectorBacktester.py` | Momentum, with the momentum lag as parameter and proportional transaction costs |
+   | `MRVectorBacktester.py` | Mean reversion (inherits from the momentum class), parametrized by SMA window and threshold |
+   
+   Each module can be run directly (`python SMAVectorBacktester.py`) thanks to the `if __name__ == '__main__'` block.
 
-- `pyalgo_eikon_eod_data.csv` — copia locale dei dati EOD usati dai moduli (gli script la scaricano anche da `http://hilpisch.com/pyalgo_eikon_eod_data.csv`).
-- `SPX_1min_05052020.csv` — dati S&P 500 a 1 minuto (5 maggio 2020).
+3. **`Generalized_backtesting.ipynb`** : recalls the classes/functions defined in the `.py` modules and plays with them: it runs the backtests in a few lines, compares results with and without transaction costs, and performs parameter optimization (built-in for SMA, a brute-force loop for mean reversion).
 
-> Nota: i moduli leggono i dati dall'URL di hilpisch.com, quindi serve una connessione Internet. In alternativa si può modificare `get_data()` per usare la copia locale del CSV.
+## Data
 
-## Requisiti
+- `pyalgo_eikon_eod_data.csv` — local copy of the EOD data used by the modules (the scripts also download it from `http://hilpisch.com/pyalgo_eikon_eod_data.csv`).
+- `SPX_1min_05052020.csv` — S&P 500 1-minute data (May 5, 2020).
+
+> Note: the modules read the data from the hilpisch.com URL, so an Internet connection is required. Alternatively, `get_data()` can be modified to use the local CSV copy.
+
+## Requirements
 
 ```
 pandas, numpy, scipy, matplotlib
 ```
 
-Ambiente consigliato: conda `arima` (vedi la repo `interactive-brokers-api`, file `arima.yml`).
+Recommended environment: conda `arima` (see the `interactive-brokers-api` repo, file `arima.yml`).
 
-- **Notebook**: selezionare il kernel **arima** nell'editor — non serve attivare l'ambiente nel terminale.
-- **Script .py da terminale**: prima eseguire `conda activate arima`.
-- **Non serve TWS/Interactive Brokers**: basta la connessione Internet per scaricare i dati da hilpisch.com (oppure usare i CSV locali).
+- **Notebooks**: select the **arima** kernel in the editor ,  no need to activate the environment in the terminal.
+- **`.py` scripts from the terminal**: run `conda activate arima` first.
+- **No TWS/Interactive Brokers needed**: an Internet connection is enough to download the data from hilpisch.com (or use the local CSVs).

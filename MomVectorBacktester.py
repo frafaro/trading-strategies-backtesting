@@ -71,7 +71,7 @@ class MomVectorBacktester(object):
         # #!=0 assigns the boolean operator, i.e. True or False -- True indicates a change in the position
         trades = data['position'].diff().fillna(0) != 0
         # subtract transaction costs from return when trade takes place, i.e. where trades has a True value the percentage of trading cost is substracted
-        data['strategy'][trades] -= self.tc
+        data.loc[trades, 'strategy'] -= self.tc
         #returns in absolute amounts
         data['creturns'] = self.amount * data['return'].cumsum().apply(np.exp)
         #strategy in absolute amounts

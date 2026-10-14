@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+pyalgo_eikon_eod_data.csv
+sma_homework_lezione3.py
+SPX_1min_05052020.csv

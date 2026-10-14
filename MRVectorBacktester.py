@@ -59,7 +59,7 @@ class MRVectorBacktester(MomVectorBacktester):
         # determine when a trade takes place
         trades = data['position'].diff().fillna(0) != 0
         # subtract transaction costs from return when trade takes place
-        data['strategy'][trades] -= self.tc
+        data.loc[trades, 'strategy'] -= self.tc
         data['creturns'] = self.amount * \
             data['return'].cumsum().apply(np.exp)
         data['cstrategy'] = self.amount * \
